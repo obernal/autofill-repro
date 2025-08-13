@@ -4,7 +4,8 @@
       "Bash(npm install:*)",
       "Bash(npm run lint)",
       "Bash(gh auth:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(npm update:*)"
     ],
     "deny": []
   }

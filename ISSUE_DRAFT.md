@@ -85,10 +85,9 @@ const Stack = createNativeStackNavigator();
 ## Investigation Notes
 
 1. **react-native-screens disabled**: Issue persists, ruling out library interaction
-2. **Direct screen access**: Autofill works correctly if login screen is initial route
-3. **Navigation-triggered**: Issue only occurs when navigating TO the login screen
-4. **Consistent workaround**: Background/foreground cycle always resolves the issue
-5. **Timing related**: Suggests Android autofill service loses context during navigation
+2. **Navigation-triggered**: Issue occurs when navigating TO the login screen
+3. **Consistent workaround**: Background/foreground cycle always resolves the issue
+4. **Timing related**: Suggests Android autofill service loses context during navigation
 
 ## Possible Root Cause
 
