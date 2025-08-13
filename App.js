@@ -1,28 +1,13 @@
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useFonts } from 'expo-font';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import WelcomeScreen from './screens/WelcomeScreen';
+import LoginScreen from './screens/LoginScreen';
+import SuccessScreen from './screens/SuccessScreen';
 
-import WelcomeScreen from '../screens/WelcomeScreen';
-import LoginScreen from '../screens/LoginScreen';
+const Stack = createNativeStackNavigator();
 
-export type RootStackParamList = {
-  Welcome: undefined;
-  Login: undefined;
-};
-
-const Stack = createNativeStackNavigator<RootStackParamList>();
-
-export default function RootLayout() {
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
-
-  if (!loaded) {
-    return null;
-  }
-
+export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Welcome">
@@ -39,8 +24,16 @@ export default function RootLayout() {
             headerBackTitleVisible: false,
           }}
         />
+        <Stack.Screen 
+          name="Success" 
+          component={SuccessScreen}
+          options={{ 
+            title: 'Success',
+            headerBackTitleVisible: false,
+            headerLeft: () => null, // Prevent going back to login after successful login
+          }}
+        />
       </Stack.Navigator>
-      <StatusBar style="auto" />
     </NavigationContainer>
   );
 }

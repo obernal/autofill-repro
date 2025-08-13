@@ -1,50 +1,105 @@
-# Welcome to your Expo app 👋
+# Autofill Bug Reproduction - React Navigation + react-native-screens
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+This is a minimal reproduction case for an autofill bug that occurs with React Navigation and react-native-screens on Android.
 
-## Get started
+## Bug Description
 
-1. Install dependencies
+When using React Navigation with `createNativeStackNavigator` and navigating to a screen with TextInputs that have proper autofill attributes, the autofill functionality is blocked on Android.
 
+### Expected Behavior
+- Navigate to Login screen
+- Tap on email field
+- Android autofill suggestions should appear
+
+### Actual Behavior
+- Navigate to Login screen
+- Tap on email field
+- Android shows "Content can't be autofilled" message
+- **Workaround**: Put app in background/overview and return while field is focused → autofill suggestions appear
+
+## Setup & Dependencies
+
+This project includes all required dependencies:
+
+- `@react-navigation/native`: ^7.1.6
+- `@react-navigation/native-stack`: ^7.3.25
+- `react-native-screens`: ~4.11.1
+- `react-native-safe-area-context`: 5.4.0
+
+## Reproduction Steps
+
+1. **Install dependencies:**
    ```bash
    npm install
    ```
 
-2. Start the app
-
+2. **Start the app:**
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+3. **Run on Android device/emulator:**
+   - Press 'a' to run on Android, or scan QR code with Expo Go
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+4. **Save credentials first (to test autofill later):**
+   - Tap "Go to Login" button on Welcome screen
+   - Enter any email (e.g., `test@example.com`) and password (e.g., `password123`)
+   - Tap "Login" button
+   - Android should prompt to save the password → **Accept**
+   - You'll see a success screen
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+5. **Test the autofill bug:**
+   - From success screen, tap "Test Autofill Again" to return to login
+   - **Clear the form fields** (or they may still contain previous values)
+   - Tap on the email field
+   - **Expected**: Autofill suggestions appear
+   - **Actual Bug**: "Content can't be autofilled" message appears
+   - **Workaround test**: Put app in background (recent apps), then return while email field is focused
+   - **Result**: Autofill suggestions now appear correctly
 
-## Get a fresh project
+## Technical Details
 
-When you're ready, run:
+### Login Screen TextInputs Configuration
+The TextInputs are properly configured with autofill attributes:
 
-```bash
-npm run reset-project
+**Email Field:**
+```javascript
+textContentType="emailAddress"
+autoComplete="email"
+importantForAutofill="yes"
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+**Password Field:**
+```javascript
+textContentType="password"
+autoComplete="current-password"
+secureTextEntry={true}
+importantForAutofill="yes"
+```
 
-## Learn more
+### Navigation Setup
+Using standard React Navigation setup:
+- `NavigationContainer` wrapper
+- `createNativeStackNavigator` (uses react-native-screens)
+- Navigation flow: Welcome → Login → Success → Login (for testing)
 
-To learn more about developing your project with Expo, look at the following resources:
+### Fake Login System
+The app includes a fake authentication system:
+- Any email/password combination works
+- Simulates network delay (1.5s)
+- Triggers Android password manager save prompt
+- Navigates to success screen after login
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Related Issues
+This appears to be a resurfaced bug related to react-native-screens and Android autofill interaction with React Navigation.
 
-## Join the community
+## Notes for Testing
+- Make sure to accept the password save prompt on first login
+- The autofill bug only manifests when navigating TO the login screen via React Navigation
+- The workaround (background/foreground) consistently resolves the issue
+- This reproduction focuses on the specific interaction between native stack navigation and autofill
 
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Test Environment
+- React Native: 0.79.5
+- React: 19.0.0
+- Expo: ~53.0.20
